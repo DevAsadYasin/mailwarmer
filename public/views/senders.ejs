@@ -1,0 +1,297 @@
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">List of Senders</h1>
+
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
+            onclick="toggleModal()">Add Sender</button>
+    <button onclick="window.location.href='/recipients'" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Go to Recipients
+    </button>
+    <button onclick="window.location.href='/logs'" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Go to Logs
+    </button>
+    <button id="startButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Start Cron Job
+    </button>
+    <button id="stopButton" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Stop Cron Job
+    </button>
+
+    <div id="modal" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-8 bg-opacity-50 shadow-lg hidden">
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold mb-4">Add Sender</h2>
+            <form id="senderForm" class="grid grid-cols-2 gap-4">
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter email"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-red-500 text-xs italic">Please enter a valid email.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="smtpHost" class="block text-gray-700 text-sm font-bold mb-2">SMTP Host</label>
+                    <input type="text" id="smtpHost" name="smtp.host" placeholder="Enter SMTP host"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-red-500 text-xs italic">Please enter SMTP host.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="smtpPort" class="block text-gray-700 text-sm font-bold mb-2">SMTP Port</label>
+                    <input type="number" id="smtpPort" name="smtp.port" placeholder="Enter SMTP port"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-red-500 text-xs italic">Please enter SMTP port.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="smtpUser" class="block text-gray-700 text-sm font-bold mb-2">SMTP Username</label>
+                    <input type="text" id="smtpUser" name="smtp.auth.user" placeholder="Enter SMTP username"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-red-500 text-xs italic">Please enter SMTP username.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="smtpPass" class="block text-gray-700 text-sm font-bold mb-2">SMTP Password</label>
+                    <input type="password" id="smtpPass" name="smtp.auth.pass" placeholder="Enter SMTP password"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-red-500 text-xs italic">Please enter SMTP password.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="imapHost" class="block text-gray-700 text-sm font-bold mb-2">IMAP Host</label>
+                    <input type="text" id="imapHost" name="imap.host" placeholder="Enter IMAP host"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-red-500 text-xs italic">Please enter IMAP host.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="imapPort" class="block text-gray-700 text-sm font-bold mb-2">IMAP Port</label>
+                    <input type="number" id="imapPort" name="imap.port" placeholder="Enter IMAP port"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-red-500 text-xs italic">Please enter IMAP port.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="imapUser" class="block text-gray-700 text-sm font-bold mb-2">IMAP Username</label>
+                    <input type="text" id="imapUser" name="imap.auth.user" placeholder="Enter IMAP username"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-red-500 text-xs italic">Please enter IMAP username.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="imapPass" class="block text-gray-700 text-sm font-bold mb-2">IMAP Password</label>
+                    <input type="password" id="imapPass" name="imap.auth.pass" placeholder="Enter IMAP password"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-red-500 text-xs italic">Please enter IMAP password.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="daily_limit" class="block text-gray-700 text-sm font-bold mb-2">Daily Limit</label>
+                    <input type="number" id="daily_limit" name="daily_limit" placeholder="Enter daily limit"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           required>
+                    <p class="text-red-500 text-xs italic">Please enter daily limit.</p>
+                </div>
+                <div class="mb-4">
+                    <label for="smtpSecure" class="block text-gray-700 text-sm font-bold mb-2">SMTP Secure</label>
+                    <select id="smtpSecure" name="smtp.secure"
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            required>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="imapSecure" class="block text-gray-700 text-sm font-bold mb-2">IMAP Secure</label>
+                    <select id="imapSecure" name="imap.secure"
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            required>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="is_active" class="block text-gray-700 text-sm font-bold mb-2">Active</label>
+                    <select id="is_active" name="is_active"
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-span-2 flex justify-end">
+                    <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                           >
+                        Save
+                    </button>
+                    <button type="button"
+                            class="ml-4 bg-gray-100 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            onclick="toggleModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <table class="table-auto w-full mt-8">
+        <thead>
+            <tr>
+                <th class="px-4 py-2">Email</th>
+                <th class="px-4 py-2">SMTP Host</th>
+                <th class="px-4 py-2">SMTP Port</th>
+                <th class="px-4 py-2">IMAP Host</th>
+                <th class="px-4 py-2">IMAP Port</th>
+                <th class="px-4 py-2">Daily Limit</th>
+                <th class="px-4 py-2">Active</th>
+                <th class="px-4 py-2">Action</th>
+                <th class="px-4 py-2">Toggle Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% senders.forEach(sender => { %>
+                <tr>
+                    <td class="border px-4 py-2"><%= sender.email %></td>
+                    <td class="border px-4 py-2"><%= sender.smtp.host %></td>
+                    <td class="border px-4 py-2"><%= sender.smtp.port %></td>
+                    <td class="border px-4 py-2"><%= sender.imap.host %></td>
+                    <td class="border px-4 py-2"><%= sender.imap.port %></td>
+                    <td class="border px-4 py-2"><%= sender.daily_limit %></td>
+                    <td class="border px-4 py-2"><%= sender.is_active ? 'Yes' : 'No' %></td>
+                    <td class="border px-6 py-2">
+                        <button onclick="deleteSender('<%= sender._id %>')" class="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                    <td class="border px-6 py-4">
+                        <button onclick="toggleSenderStatus('<%= sender._id %>')" class="text-green-600 hover:text-blue-900">Toggle Status</button>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function toggleModal() {
+        const modal = document.getElementById('modal');
+        modal.classList.toggle('hidden');
+    }
+
+    async function deleteSender(_id) {
+        if (confirm('Are you sure you want to delete this sender?')) {
+            try {
+                console.log(_id)
+                const response = await fetch('/senders/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ _id: _id })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error deleting sender');
+                }
+
+                const data = await response.json();
+                alert('Sender deleted successfully!');
+                window.location.reload();
+            } catch (err) {
+                console.error('Error deleting sender:', err);
+                alert('Error deleting sender. Please try again later.');
+            }
+        }
+    }
+    async function toggleSenderStatus(_id) {
+        if (confirm(`Are you sure you want to Toggle this sender?`)) {
+            try {
+                const response = await fetch('/senders/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ _id: _id })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error updating sender status');
+                }
+
+                const data = await response.json();
+                alert(`Sender Toggled successfully!`);
+                window.location.reload();
+            } catch (err) {
+                console.error('Error updating sender status:', err);
+                alert('Error updating sender status. Please try again later.');
+            }
+        }
+    }
+    document.getElementById('startButton').addEventListener('click', async () => {
+        const response = await fetch('/cronJob/start', { method: 'POST' });
+        const result = await response.json();
+        alert(result.message);
+    });
+
+    document.getElementById('stopButton').addEventListener('click', async () => {
+        const response = await fetch('/cronJob/stop', { method: 'POST' });
+        const result = await response.json();
+        alert(result.message);
+    });
+
+    document.getElementById('senderForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => data[key] = value);
+
+        try {
+            const response = await fetch('/senders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error('Error saving sender');
+            }
+
+            const result = await response.json();
+            alert('Sender saved successfully!');
+            window.location.reload();
+        } catch (err) {
+            console.error('Error saving sender:', err);
+            alert('Error saving sender. Please try again later.');
+        }
+    });
+
+    async function checkCronStatus() {
+            const response = await fetch('/cronJob/status');
+            const result = await response.json();
+            return result.isRunning;
+        }
+
+        async function toggleCronJob() {
+            const isRunning = await checkCronStatus();
+            const response = await fetch(isRunning ? '/cronJob/stop' : '/cronJob/start', {
+                method: 'POST'
+            });
+            const result = await response.json();
+            alert(result.message);
+            updateButton();
+        }
+
+        async function updateButton() {
+            const isRunning = await checkCronStatus();
+            const toggleButton = document.getElementById('toggleButton');
+            toggleButton.textContent = isRunning ? 'Stop Cron Job' : 'Start Cron Job';
+            toggleButton.classList.toggle('bg-red-500', isRunning);
+            toggleButton.classList.toggle('bg-green-500', !isRunning);
+        }
+
+        document.getElementById('toggleButton').addEventListener('click', toggleCronJob);
+
+        // Initial button update
+        updateButton();
+
+</script>

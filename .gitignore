@@ -1,0 +1,23 @@
+
+### `.gitignore`
+
+Create a `.gitignore` file in the root directory to specify files and directories that should not be tracked by Git. This helps avoid committing sensitive information and unnecessary files to your repository.
+
+```plaintext
+# Dependency directories
+node_modules/
+
+# Environment variables file
+.env
+
+# Editor and IDE files
+.vscode/
+.idea/
+
+# macOS system files
+.DS_Store
+
+db_data
+
+senders.csv
+recipients.csv

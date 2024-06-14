@@ -1,0 +1,98 @@
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">List of recipients</h1>
+    <button onclick="window.location.href='/'" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Go to Home
+    </button>
+    <form id="recipientForm" class="grid grid-cols-2 gap-4">
+        <div class="mb-4">
+            <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter email"
+                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                   required>
+            <p class="text-red-500 text-xs italic">Please enter a valid email.</p>
+        </div>
+        <div>
+            <button type="submit"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-7"
+            >
+                Save
+            </button>
+        </div>
+        </form>
+    <table class="table-auto w-full mt-8">
+        <thead>
+            <tr>
+                <th class="px-4 py-2">Email</th>
+                <th class="px-4 py-2">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% recipients.forEach(recepient => { %>
+                <tr>
+                    <td class="border px-4 py-2"><%= recepient.email %></td>
+                    <td class="border px-6 py-2">
+                        <button onclick="deleteRecepient('<%= recepient._id %>')" class="text-red-600 hover:text-red-900">Delete</button>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    async function deleteRecepient(_id) {
+        if (confirm('Are you sure you want to delete this recipient?')) {
+            try {
+                const response = await fetch('/recipients/delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: _id })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error deleting recipient');
+                }
+
+                const data = await response.json();
+                alert('recipient deleted successfully!');
+                window.location.reload();
+            } catch (err) {
+                console.error('Error deleting recipient:', err);
+                alert('Error deleting recipient. Please try again later.');
+            }
+        }
+    }
+
+    document.getElementById('recipientForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => data[key] = value);
+
+        try {
+            const response = await fetch('/recipients', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error('Error saving recipient');
+            }
+
+            const result = await response.json();
+            alert('Recipient saved successfully!');
+            window.location.reload();
+        } catch (err) {
+            console.error('Error saving recipient:', err);
+            alert('Error saving recipient. Please try again later.');
+        }
+    });
+
+</script>
