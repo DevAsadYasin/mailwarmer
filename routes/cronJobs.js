@@ -63,12 +63,11 @@ router.post('/start', async (req, res) => {
         if (isCronRunning) {
             res.send({ message: 'Cron job is already running' });
         } else {
+            res.send({ message: 'Cron job started' });
             await sendEmails();
             cronJob = cron.schedule('0 0 * * *', sendEmails);
             cronJob.start();
             isCronRunning = true;
-
-            res.send({ message: 'Cron job started' });
         }
     } catch (error) {
         console.error('Failed to start cron job:', error);
