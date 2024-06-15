@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Recipient = require('../models/Recipient');
 const axios = require('axios');
+const dotenv = require('dotenv');
+
+dotenv.config();
+const appUrl = process.env.APP_URL; 
 
 router.post('/', async (req, res) => {
     try {
@@ -45,7 +49,7 @@ router.post('/delete', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const response = await axios.get('http://localhost:3000/recipients/all');
+        const response = await axios.get(`${appUrl}/recipients/all`);
         const recipients = response.data;
         res.render('recipients', { recipients, title: 'Recipients' });
     } catch (err) {

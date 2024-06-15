@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Log = require('../models/Log');
 const axios = require('axios');
+const dotenv = require('dotenv');
+
+dotenv.config();
+const appUrl = process.env.APP_URL; 
 
 router.get('/all', async (req, res) => {
     try {
@@ -15,7 +19,7 @@ router.get('/all', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const response = await axios.get('http://localhost:3000/logs/all');
+        const response = await axios.get(`${appUrl}/logs/all`);
         const logs = response.data;
         res.render('logs', { logs, title: 'Logs' });
     } catch (err) {
