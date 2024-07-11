@@ -18,6 +18,7 @@ const sendEmailWithDelay = async (transporter, mailOptions) => {
                 resolve();
             } catch (error) {
                 console.error(`Error sending email from ${mailOptions.from} to ${mailOptions.to}:`, error);
+                await Log.create({ sender: mailOptions.from, recipient: mailOptions.to, subject: mailOptions.subject, body: mailOptions.text, date: new Date(), status: 'failed', error: error.message });
                 resolve();
             }
         }, 60000);
@@ -31,7 +32,14 @@ const sendEmails = async () => {
         const sentEmails = {};
 
         for (const sender of senders) {
-            const transporter = nodemailer.createTransport(sender.smtp);
+            let transporter;
+            try {
+                transporter = nodemailer.createTransport(sender.smtp);
+            } catch (error) {
+                console.error(`Error setting up transporter for sender ${sender.email}:`, error);
+                await Log.create({ sender: sender.email, recipient: 'N/A', subject: 'N/A', body: 'N/A', date: new Date(), status: 'failed', error: error.message });
+                continue;
+            }
 
             for (let i = 0; i < sender.daily_limit; i++) {
                 const recipient = recipients[Math.floor(Math.random() * recipients.length)] || { email: 'technology14781@gmail.com' };
@@ -46,7 +54,7 @@ const sendEmails = async () => {
                 };
 
                 await sendEmailWithDelay(transporter, mailOptions);
-                await Log.create({ sender: sender.email, recipient: recipient.email, subject: mailOptions.subject, body: mailOptions.text, date: new Date() });
+                await Log.create({ sender: sender.email, recipient: recipient.email, subject: mailOptions.subject, body: mailOptions.text, date: new Date(), status: 'sent' });
                 sentEmails[sender.email].push(recipient.email);
             }
         }
