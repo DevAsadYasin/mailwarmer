@@ -10,11 +10,13 @@
         <table class="min-w-full bg-white">
             <thead>
                 <tr>
-                    <th class="w-1/5 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Sender</th>
-                    <th class="w-1/5 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Recipient</th>
-                    <th class="w-1/5 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Subject</th>
-                    <th class="w-2/5 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Body</th>
-                    <th class="w-1/5 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Date</th>
+                    <th class="w-1/7 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Sender</th>
+                    <th class="w-1/7 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Recipient</th>
+                    <th class="w-1/7 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Subject</th>
+                    <th class="w-1/7 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Body</th>
+                    <th class="w-1/7 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Status</th>
+                    <th class="w-1/7 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Date</th>
+                    <th class="w-1/7 px-4 py-2 border-b-2 border-gray-200 bg-gray-100 text-left text-sm leading-4 text-gray-600 font-medium">Error</th>
                 </tr>
             </thead>
             <tbody>
@@ -24,7 +26,9 @@
                         <td class="border px-4 py-2 text-sm text-gray-700"><%= log.recipient %></td>
                         <td class="border px-4 py-2 text-sm text-gray-700"><%= log.subject %></td>
                         <td class="border px-4 py-2 text-sm text-gray-700"><%= log.body %></td>
+                        <td class="border px-4 py-2 text-sm text-gray-700"><%= log.status %></td>
                         <td class="border px-4 py-2 text-sm text-gray-700"><%= new Date(log.date).toLocaleString() %></td>
+                        <td class="border px-4 py-2 text-sm text-gray-700"><%= log.error %></td>
                     </tr>
                 <% }); %>
             </tbody>

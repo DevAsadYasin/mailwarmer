@@ -10,97 +10,126 @@ let cronJob;
 let isCronRunning = false;
 
 const sendEmailWithDelay = async (transporter, mailOptions) => {
-    return new Promise((resolve) => {
-        setTimeout(async () => {
-            try {
-                await transporter.sendMail(mailOptions);
-                console.log(`Email sent successfully from ${mailOptions.from} to ${mailOptions.to}`);
-                resolve();
-            } catch (error) {
-                console.error(`Error sending email from ${mailOptions.from} to ${mailOptions.to}:`, error);
-                await Log.create({ sender: mailOptions.from, recipient: mailOptions.to, subject: mailOptions.subject, body: mailOptions.text, date: new Date(), status: 'failed', error: error.message });
-                resolve();
-            }
-        }, 60000);
-    });
+  return new Promise((resolve) => {
+    setTimeout(async () => {
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Email sent successfully from ${mailOptions.from} to ${mailOptions.to}`);
+        resolve('sent');
+      } catch (error) {
+        console.error(`Error sending email from ${mailOptions.from} to ${mailOptions.to}:`, error);
+        await Log.create({
+          sender: mailOptions.from,
+          recipient: mailOptions.to,
+          subject: mailOptions.subject,
+          body: mailOptions.text,
+          date: new Date(),
+          status: 'failed',
+          error: error.message
+        });
+        resolve('failed');
+      }
+    }, 60000);
+  });
 };
+
 
 const sendEmails = async () => {
-    try {
-        const senders = await Sender.find({ is_active: true });
-        const recipients = await Recipient.find({});
-        const sentEmails = {};
+  try {
+    const senders = await Sender.find({ is_active: true });
+    const recipients = await Recipient.find({});
+    const sentEmails = {};
 
-        for (const sender of senders) {
-            let transporter;
-            try {
-                transporter = nodemailer.createTransport(sender.smtp);
-            } catch (error) {
-                console.error(`Error setting up transporter for sender ${sender.email}:`, error);
-                await Log.create({ sender: sender.email, recipient: 'N/A', subject: 'N/A', body: 'N/A', date: new Date(), status: 'failed', error: error.message });
-                continue;
-            }
+    for (const sender of senders) {
+      let transporter;
+      try {
+        transporter = nodemailer.createTransport(sender.smtp);
+      } catch (error) {
+        console.error(`Error setting up transporter for sender ${sender.email}:`, error);
+        await Log.create({
+          sender: sender.email,
+          recipient: 'N/A',
+          subject: 'N/A',
+          body: 'N/A',
+          date: new Date(),
+          status: 'failed',
+          error: error.message
+        });
+        continue;
+      }
 
-            for (let i = 0; i < sender.daily_limit; i++) {
-                const recipient = recipients[Math.floor(Math.random() * recipients.length)] || { email: 'technology14781@gmail.com' };
-                if (!sentEmails[sender.email]) sentEmails[sender.email] = [];
-                if (sentEmails[sender.email].includes(recipient.email)) continue;
+      for (let i = 0; i < sender.daily_limit; i++) {
+        const recipient = recipients[Math.floor(Math.random() * recipients.length)] || { email: 'technology14781@gmail.com' };
+        if (!sentEmails[sender.email]) sentEmails[sender.email] = [];
+        if (sentEmails[sender.email].includes(recipient.email)) continue;
 
-                const mailOptions = {
-                    from: sender.email,
-                    to: recipient.email,
-                    subject: 'Test Email',
-                    text: 'This is a test email.'
-                };
+        const mailOptions = {
+          from: sender.email,
+          to: recipient.email,
+          subject: 'Test Email',
+          text: 'This is a test email.'
+        };
 
-                await sendEmailWithDelay(transporter, mailOptions);
-                await Log.create({ sender: sender.email, recipient: recipient.email, subject: mailOptions.subject, body: mailOptions.text, date: new Date(), status: 'sent' });
-                sentEmails[sender.email].push(recipient.email);
-            }
+        const status = await sendEmailWithDelay(transporter, mailOptions);
+        if (status === 'sent') {
+          await Log.create({
+            sender: sender.email,
+            recipient: recipient.email,
+            subject: mailOptions.subject,
+            body: mailOptions.text,
+            date: new Date(),
+            status: 'sent'
+          });
         }
 
-        console.log('Email sending process completed successfully.');
-    } catch (error) {
-        console.error('Error sending emails:', error);
-        throw error;
+        sentEmails[sender.email].push(recipient.email);
+      }
     }
+
+    console.log('Email sending process completed successfully.');
+  } catch (error) {
+    console.error('Error sending emails:', error);
+    throw error;
+  }
 };
 
+
 router.post('/start', async (req, res) => {
-    try {
-        if (isCronRunning) {
-            res.send({ message: 'Cron job is already running' });
-        } else {
-            res.send({ message: 'Cron job started' });
-            await sendEmails();
-            cronJob = cron.schedule('0 0 * * *', sendEmails);
-            cronJob.start();
-            isCronRunning = true;
-        }
-    } catch (error) {
-        console.error('Failed to start cron job:', error);
-        res.status(500).send({ error: 'Failed to start cron job', message: error.message });
+  try {
+    if (isCronRunning) {
+      res.send({ message: 'Cron job is already running' });
+    } else {
+      res.send({ message: 'Cron job started' });
+      isCronRunning = true;
+      cronJob = cron.schedule('0 0 * * *', sendEmails, {
+        scheduled: true
+    });
+      cronJob.start();
     }
+  } catch (error) {
+    console.error('Failed to start cron job:', error);
+    res.status(500).send({ error: 'Failed to start cron job', message: error.message });
+  }
 });
 
 router.post('/stop', async (req, res) => {
-    try {
-        if (isCronRunning) {
-            cronJob.stop();
-            cronJob = null;
-            isCronRunning = false;
-            res.send({ message: 'Cron job stopped' });
-        } else {
-            res.send({ message: 'No cron job to stop' });
-        }
-    } catch (error) {
-        console.error('Failed to stop cron job:', error);
-        res.status(500).send({ error: 'Failed to stop cron job', message: error.message });
+  try {
+    if (isCronRunning) {
+      cronJob.stop();
+      cronJob = null;
+      isCronRunning = false;
+      res.send({ message: 'Cron job stopped' });
+    } else {
+      res.send({ message: 'No cron job to stop' });
     }
+  } catch (error) {
+    console.error('Failed to stop cron job:', error);
+    res.status(500).send({ error: 'Failed to stop cron job', message: error.message });
+  }
 });
 
 router.get('/status', (req, res) => {
-    res.send({ isRunning: isCronRunning });
+  res.send({ isRunning: isCronRunning });
 });
 
 module.exports = router;
