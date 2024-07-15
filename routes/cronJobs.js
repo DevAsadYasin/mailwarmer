@@ -36,6 +36,7 @@ const sendEmailWithDelay = async (transporter, mailOptions) => {
 
 const sendEmails = async () => {
   try {
+    console.log('Sending Mail in progress');
     const senders = await Sender.find({ is_active: true });
     const recipients = await Recipient.find({});
     const sentEmails = {};
@@ -106,6 +107,7 @@ router.post('/start', async (req, res) => {
     });
       cronJob.start();
     }
+    sendEmails();
   } catch (error) {
     console.error('Failed to start cron job:', error);
     res.status(500).send({ error: 'Failed to start cron job', message: error.message });
