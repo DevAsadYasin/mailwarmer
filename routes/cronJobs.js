@@ -47,6 +47,7 @@ const sendEmails = async () => {
         transporter = nodemailer.createTransport(sender.smtp);
       } catch (error) {
         console.error(`Error setting up transporter for sender ${sender.smtp.auth.user}:`, error);
+        console.log(`Error in sending mail from ${sender.smtp.auth.user}`);
         await Log.create({
           sender: sender.smtp.auth.user,
           recipient: 'N/A',
@@ -73,6 +74,7 @@ const sendEmails = async () => {
 
         const status = await sendEmailWithDelay(transporter, mailOptions);
         if (status === 'sent') {
+          console.log(`Email sent from ${sender.smtp.auth.user} to ${recipient.email}`);
           await Log.create({
             sender: sender.smtp.auth.user,
             recipient: recipient.email,
@@ -106,6 +108,7 @@ router.post('/start', async (req, res) => {
         scheduled: true
     });
       cronJob.start();
+      console.log('Warmer have been started');
     }
     sendEmails();
   } catch (error) {
