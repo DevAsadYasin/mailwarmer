@@ -23,13 +23,6 @@
             <h2 class="text-xl font-bold mb-4">Add Sender</h2>
             <form id="senderForm" class="grid grid-cols-2 gap-4">
                 <div class="mb-4">
-                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Enter email"
-                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                           required>
-                    <p class="text-red-500 text-xs italic">Please enter a valid email.</p>
-                </div>
-                <div class="mb-4">
                     <label for="smtpHost" class="block text-gray-700 text-sm font-bold mb-2">SMTP Host</label>
                     <input type="text" id="smtpHost" name="smtp.host" placeholder="Enter SMTP host"
                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -58,34 +51,6 @@
                     <p class="text-red-500 text-xs italic">Please enter SMTP password.</p>
                 </div>
                 <div class="mb-4">
-                    <label for="imapHost" class="block text-gray-700 text-sm font-bold mb-2">IMAP Host</label>
-                    <input type="text" id="imapHost" name="imap.host" placeholder="Enter IMAP host"
-                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                           required>
-                    <p class="text-red-500 text-xs italic">Please enter IMAP host.</p>
-                </div>
-                <div class="mb-4">
-                    <label for="imapPort" class="block text-gray-700 text-sm font-bold mb-2">IMAP Port</label>
-                    <input type="number" id="imapPort" name="imap.port" placeholder="Enter IMAP port"
-                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                           required>
-                    <p class="text-red-500 text-xs italic">Please enter IMAP port.</p>
-                </div>
-                <div class="mb-4">
-                    <label for="imapUser" class="block text-gray-700 text-sm font-bold mb-2">IMAP Username</label>
-                    <input type="text" id="imapUser" name="imap.auth.user" placeholder="Enter IMAP username"
-                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                           required>
-                    <p class="text-red-500 text-xs italic">Please enter IMAP username.</p>
-                </div>
-                <div class="mb-4">
-                    <label for="imapPass" class="block text-gray-700 text-sm font-bold mb-2">IMAP Password</label>
-                    <input type="password" id="imapPass" name="imap.auth.pass" placeholder="Enter IMAP password"
-                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                           required>
-                    <p class="text-red-500 text-xs italic">Please enter IMAP password.</p>
-                </div>
-                <div class="mb-4">
                     <label for="daily_limit" class="block text-gray-700 text-sm font-bold mb-2">Daily Limit</label>
                     <input type="number" id="daily_limit" name="daily_limit" placeholder="Enter daily limit"
                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -95,15 +60,6 @@
                 <div class="mb-4">
                     <label for="smtpSecure" class="block text-gray-700 text-sm font-bold mb-2">SMTP Secure</label>
                     <select id="smtpSecure" name="smtp.secure"
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            required>
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="imapSecure" class="block text-gray-700 text-sm font-bold mb-2">IMAP Secure</label>
-                    <select id="imapSecure" name="imap.secure"
                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             required>
                         <option value="true">Yes</option>
@@ -137,11 +93,9 @@
     <table class="table-auto w-full mt-8">
         <thead>
             <tr>
-                <th class="px-4 py-2">Email</th>
+                <th class="px-4 py-2">SMTP Username</th>
                 <th class="px-4 py-2">SMTP Host</th>
                 <th class="px-4 py-2">SMTP Port</th>
-                <th class="px-4 py-2">IMAP Host</th>
-                <th class="px-4 py-2">IMAP Port</th>
                 <th class="px-4 py-2">Daily Limit</th>
                 <th class="px-4 py-2">Active</th>
                 <th class="px-4 py-2">Action</th>
@@ -151,11 +105,9 @@
         <tbody>
             <% senders.forEach(sender => { %>
                 <tr>
-                    <td class="border px-4 py-2"><%= sender.email %></td>
+                    <td class="border px-4 py-2"><%= sender.smtp.auth.user %></td>
                     <td class="border px-4 py-2"><%= sender.smtp.host %></td>
                     <td class="border px-4 py-2"><%= sender.smtp.port %></td>
-                    <td class="border px-4 py-2"><%= sender.imap.host %></td>
-                    <td class="border px-4 py-2"><%= sender.imap.port %></td>
                     <td class="border px-4 py-2"><%= sender.daily_limit %></td>
                     <td class="border px-4 py-2"><%= sender.is_active ? 'Yes' : 'No' %></td>
                     <td class="border px-6 py-2">
@@ -291,7 +243,6 @@
 
         document.getElementById('toggleButton').addEventListener('click', toggleCronJob);
 
-        // Initial button update
         updateButton();
 
 </script>

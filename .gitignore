@@ -19,5 +19,4 @@ node_modules/
 
 db_data
 
-senders.csv
-recipients.csv
+*.csv

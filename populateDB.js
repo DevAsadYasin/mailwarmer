@@ -5,6 +5,7 @@ const csv = require('csv-parser');
 const Sender = require('./models/Sender');
 const Recipient = require('./models/Recipient');
 const dotenv = require('dotenv');
+dotenv.config();
 
 const mongoUri = process.env.MONGODB_URI;
 
@@ -22,33 +23,20 @@ const populateDB = async () => {
     const senders = [];
     const recipients = [];
 
-    const senderStream = fs.createReadStream(path.join(__dirname, 'senders.csv'))
+    const senderStream = fs.createReadStream(path.join(__dirname, 'data.csv'))
         .pipe(csv())
         .on('data', (row) => {
             const sender = {
-                email: row['Email'],
                 smtp: {
-                    host: row['SMTP Host'],
+                    host: row['Host'],
                     port: parseInt(row['SMTP Port']),
-                    secure: row['SMTP Port'] == 465,
+                    secure: true,
                     auth: {
-                        user: row['SMTP Username'],
-                        pass: row['SMTP Password']
+                        user: row['Email'],
+                        pass: row['PWD']
                     }
                 },
-                imap: {
-                    host: row['IMAP Host'],
-                    port: parseInt(row['IMAP Port']),
-                    secure: row['IMAP Port'] == 993,
-                    auth: {
-                        user: row['IMAP Username'],
-                        pass: row['IMAP Password']
-                    }
-                },
-                daily_limit: parseInt(row['Daily Limit']),
-                warmupEnabled: row['Warmup Enabled'].toUpperCase() === 'TRUE',
-                warmupLimit: parseInt(row['Warmup Limit']),
-                warmupIncrement: parseInt(row['Warmup Increment'])
+                daily_limit: 100
             };
 
             senders.push(sender);

@@ -53,7 +53,6 @@ const imapFetch = async (sender) => {
 router.post('/', async (req, res) => {
     try {
         const newSender = new Sender({
-            email: req.body.email,
             smtp: {
                 host: req.body['smtp.host'],
                 port: req.body['smtp.port'],
@@ -61,15 +60,6 @@ router.post('/', async (req, res) => {
                 auth: {
                     user: req.body['smtp.auth.user'],
                     pass: req.body['smtp.auth.pass']
-                }
-            },
-            imap: {
-                host: req.body['imap.host'],
-                port: req.body['imap.port'],
-                secure: req.body['imap.secure'],
-                auth: {
-                    user: req.body['imap.auth.user'],
-                    pass: req.body['imap.auth.pass']
                 }
             },
             daily_limit: req.body.daily_limit,
