@@ -5,21 +5,21 @@ dotenv.config();
 const mongoURI = "";
 
 mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    authSource: "admin"
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  authSource: "admin"
 })
-.then(() => {
+  .then(() => {
     console.log('Connected to MongoDB');
-    
+
     return mongoose.connection.db.dropDatabase();
-})
-.then(() => {
+  })
+  .then(() => {
     console.log('Database dropped');
-})
-.catch(error => {
+  })
+  .catch(error => {
     console.error('Error:', error);
-})
-.finally(() => {
+  })
+  .finally(() => {
     mongoose.disconnect();
-});
+  });
