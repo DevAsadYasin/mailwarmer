@@ -46,9 +46,9 @@ const sendEmails = async () => {
       try {
         transporter = nodemailer.createTransport(sender.smtp);
       } catch (error) {
-        console.error(`Error setting up transporter for sender ${sender.email}:`, error);
+        console.error(`Error setting up transporter for sender ${sender.smtp.auth.user}:`, error);
         await Log.create({
-          sender: sender.email,
+          sender: sender.smtp.auth.user,
           recipient: 'N/A',
           subject: 'N/A',
           body: 'N/A',
@@ -61,11 +61,11 @@ const sendEmails = async () => {
 
       for (let i = 0; i < sender.daily_limit; i++) {
         const recipient = recipients[Math.floor(Math.random() * recipients.length)] || { email: 'technology14781@gmail.com' };
-        if (!sentEmails[sender.email]) sentEmails[sender.email] = [];
-        if (sentEmails[sender.email].includes(recipient.email)) continue;
+        if (!sentEmails[sender.smtp.auth.user]) sentEmails[sender.smtp.auth.user] = [];
+        if (sentEmails[sender.smtp.auth.user].includes(recipient.email)) continue;
 
         const mailOptions = {
-          from: sender.email,
+          from: sender.smtp.auth.user,
           to: recipient.email,
           subject: 'Test Email',
           text: 'This is a test email.'
@@ -74,7 +74,7 @@ const sendEmails = async () => {
         const status = await sendEmailWithDelay(transporter, mailOptions);
         if (status === 'sent') {
           await Log.create({
-            sender: sender.email,
+            sender: sender.smtp.auth.user,
             recipient: recipient.email,
             subject: mailOptions.subject,
             body: mailOptions.text,
@@ -83,7 +83,7 @@ const sendEmails = async () => {
           });
         }
 
-        sentEmails[sender.email].push(recipient.email);
+        sentEmails[sender.smtp.auth.user].push(recipient.email);
       }
     }
 
