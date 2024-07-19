@@ -33,16 +33,18 @@ const sendEmailWithDelay = async (transporter, mailOptions) => {
   });
 };
 
-
 const sendEmails = async () => {
   try {
     console.log('Sending Mail in progress');
     const senders = await Sender.find({ is_active: true });
     const recipients = await Recipient.find({});
     const sentEmails = {};
+    const failureCounts = {}; // Track failure counts for each sender
 
     for (const sender of senders) {
       let transporter;
+      failureCounts[sender.smtp.auth.user] = 0;
+
       try {
         transporter = nodemailer.createTransport(sender.smtp);
       } catch (error) {
@@ -61,7 +63,7 @@ const sendEmails = async () => {
       }
 
       for (let i = 0; i < sender.daily_limit; i++) {
-        const recipient = recipients[Math.floor(Math.random() * recipients.length)] || { email: 'jeff.robison@firstunitedbank.com	' };
+        const recipient = recipients[Math.floor(Math.random() * recipients.length)] || { email: 'jeff.robison@firstunitedbank.com' };
         if (!sentEmails[sender.smtp.auth.user]) sentEmails[sender.smtp.auth.user] = [];
         if (sentEmails[sender.smtp.auth.user].includes(recipient.email)) continue;
 
@@ -83,6 +85,13 @@ const sendEmails = async () => {
             date: new Date(),
             status: 'sent'
           });
+          failureCounts[sender.smtp.auth.user] = 0; // Reset failure count on success
+        } else {
+          failureCounts[sender.smtp.auth.user]++;
+          if (failureCounts[sender.smtp.auth.user] >= 5) {
+            console.log(`Skipping sender ${sender.smtp.auth.user} after 5 consecutive failures`);
+            break; // Skip to the next sender
+          }
         }
 
         sentEmails[sender.smtp.auth.user].push(recipient.email);
@@ -96,7 +105,6 @@ const sendEmails = async () => {
   }
 };
 
-
 router.post('/start', async (req, res) => {
   try {
     if (isCronRunning) {
@@ -106,7 +114,7 @@ router.post('/start', async (req, res) => {
       isCronRunning = true;
       cronJob = cron.schedule('0 0 * * *', sendEmails, {
         scheduled: true
-    });
+      });
       cronJob.start();
       console.log('Warmer have been started');
     }
