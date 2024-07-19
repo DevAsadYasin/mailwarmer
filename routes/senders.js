@@ -1,54 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Imap = require('node-imap');
 const Sender = require('../models/Sender');
-const axios = require('axios');
-
-const imapFetch = async (sender) => {
-    const imapConfig = {
-        user: sender.imap.auth.user,
-        password: sender.imap.auth.pass,
-        host: sender.imap.host,
-        port: sender.imap.port,
-        tls: sender.imap.secure
-    };
-
-    const imap = new Imap(imapConfig);
-
-    imap.once('ready', () => {
-        imap.openBox('INBOX', true, (err, box) => {
-            if (err) throw err;
-            imap.search(['ALL'], (searchErr, results) => {
-                if (searchErr) throw searchErr;
-                const fetch = imap.fetch(results, { bodies: '' });
-                fetch.on('message', (msg) => {
-                    msg.on('body', (stream, info) => {
-                        let buffer = '';
-                        stream.on('data', (chunk) => {
-                            buffer += chunk.toString('utf8');
-                        });
-                        stream.once('end', () => {
-                            console.log(buffer);
-                        });
-                    });
-                });
-                fetch.once('end', () => {
-                    imap.end();
-                });
-            });
-        });
-    });
-
-    imap.once('error', (err) => {
-        console.error(err);
-    });
-
-    imap.once('end', () => {
-        console.log('Connection ended');
-    });
-
-    imap.connect();
-};
 
 router.post('/', async (req, res) => {
     try {
