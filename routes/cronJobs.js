@@ -39,7 +39,7 @@ const sendEmails = async () => {
     const senders = await Sender.find({ is_active: true });
     const recipients = await Recipient.find({});
     const sentEmails = {};
-    const failureCounts = {}; // Track failure counts for each sender
+    const failureCounts = {};
 
     for (const sender of senders) {
       let transporter;
@@ -96,6 +96,7 @@ const sendEmails = async () => {
 
         sentEmails[sender.smtp.auth.user].push(recipient.email);
       }
+      transporter.close();
     }
 
     console.log('Email sending process completed successfully.');
