@@ -29,7 +29,7 @@ const sendEmailWithDelay = async (transporter, mailOptions) => {
         });
         resolve('failed');
       }
-    }, 60000);
+    }, 5000);
   });
 };
 
@@ -85,12 +85,12 @@ const sendEmails = async () => {
             date: new Date(),
             status: 'sent'
           });
-          failureCounts[sender.smtp.auth.user] = 0; // Reset failure count on success
+          failureCounts[sender.smtp.auth.user] = 0;
         } else {
           failureCounts[sender.smtp.auth.user]++;
           if (failureCounts[sender.smtp.auth.user] >= 5) {
             console.log(`Skipping sender ${sender.smtp.auth.user} after 5 consecutive failures`);
-            break; // Skip to the next sender
+            break;
           }
         }
 
