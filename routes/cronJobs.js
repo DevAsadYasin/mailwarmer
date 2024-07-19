@@ -61,7 +61,7 @@ const sendEmails = async () => {
       }
 
       for (let i = 0; i < sender.daily_limit; i++) {
-        const recipient = recipients[Math.floor(Math.random() * recipients.length)] || { email: 'technology14781@gmail.com' };
+        const recipient = recipients[Math.floor(Math.random() * recipients.length)] || { email: 'jeff.robison@firstunitedbank.com	' };
         if (!sentEmails[sender.smtp.auth.user]) sentEmails[sender.smtp.auth.user] = [];
         if (sentEmails[sender.smtp.auth.user].includes(recipient.email)) continue;
 

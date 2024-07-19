@@ -71,4 +71,4 @@ const populateDB = async () => {
     });
 };
 
-populateDB();ƒƒ
+populateDB();
