@@ -37,7 +37,7 @@ const sendEmailWithDelay = async (transporter, mailOptions, retries = 3) => {
 const sendEmails = async () => {
   try {
     console.log('Sending Mail in progress');
-    const senders = await Sender.find({ is_active: true });
+    const senders = await Sender.find({ is_active: true }).sort({ _id: -1 });
     const recipients = await Recipient.find({});
     const sentEmails = {};
     const failureCounts = {};
