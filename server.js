@@ -1,4 +1,5 @@
 const express = require('express');
+var cors = require('cors')
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -6,6 +7,7 @@ const axios = require('axios');
 const dotenv = require('dotenv');
 
 const app = express();
+app.use(cors())
 dotenv.config();
 
 const port = process.env.PORT || 3000;

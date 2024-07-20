@@ -9,15 +9,15 @@ const router = express.Router();
 let cronJob;
 let isCronRunning = false;
 
-const sendEmailWithDelay = async (transporter, mailOptions) => {
-  return new Promise((resolve) => {
-    setTimeout(async () => {
-      try {
-        await transporter.sendMail(mailOptions);
-        console.log(`Email sent successfully from ${mailOptions.from} to ${mailOptions.to}`);
-        resolve('sent');
-      } catch (error) {
-        console.error(`Error sending email from ${mailOptions.from} to ${mailOptions.to}:`, error);
+const sendEmailWithDelay = async (transporter, mailOptions, retries = 3) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`Email sent successfully from ${mailOptions.from} to ${mailOptions.to}`);
+      return 'sent';
+    } catch (error) {
+      console.error(`Attempt ${attempt} - Error sending email from ${mailOptions.from} to ${mailOptions.to}:`, error);
+      if (attempt === retries) {
         await Log.create({
           sender: mailOptions.from,
           recipient: mailOptions.to,
@@ -27,10 +27,11 @@ const sendEmailWithDelay = async (transporter, mailOptions) => {
           status: 'failed',
           error: error.message
         });
-        resolve('failed');
+        return 'failed';
       }
-    }, 500);
-  });
+    }
+    await new Promise(resolve => setTimeout(resolve, 5000));
+  }
 };
 
 const sendEmails = async () => {
@@ -49,7 +50,6 @@ const sendEmails = async () => {
         transporter = nodemailer.createTransport(sender.smtp);
       } catch (error) {
         console.error(`Error setting up transporter for sender ${sender.smtp.auth.user}:`, error);
-        console.log(`Error in sending mail from ${sender.smtp.auth.user}`);
         await Log.create({
           sender: sender.smtp.auth.user,
           recipient: 'N/A',
@@ -95,6 +95,7 @@ const sendEmails = async () => {
         }
 
         sentEmails[sender.smtp.auth.user].push(recipient.email);
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
       transporter.close();
     }
