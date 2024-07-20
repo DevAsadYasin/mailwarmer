@@ -29,7 +29,7 @@ const sendEmailWithDelay = async (transporter, mailOptions) => {
         });
         resolve('failed');
       }
-    }, 5000);
+    }, 500);
   });
 };
 
